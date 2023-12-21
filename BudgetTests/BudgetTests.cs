@@ -33,6 +33,22 @@ public class BudgetTests
 
         amount.Should().Be(3100);
     }
+    
+    [Test]
+    public void query_invalid_period()
+    {
+        GivenBudget(
+            new BudgetDto()
+            {
+                YearMonth = "202312",
+                Amount = 3100
+            }
+        );
+
+        var amount = WhenQueryBudget(new DateTime(2024, 12, 01), new DateTime(2023, 12, 31));
+
+        amount.Should().Be(0);
+    }
 
     [Test]
     public void query_cross_month()
@@ -75,6 +91,34 @@ public class BudgetTests
         amount.Should().Be(1000);
     }
 
+    [Test]
+    public void query_over_two_month()
+    {
+        GivenBudget(
+            new BudgetDto()
+            {
+                YearMonth = "202312",
+                Amount = 3100
+            },
+            new BudgetDto()
+            {
+                YearMonth = "202311",
+                Amount = 600
+            },
+            new BudgetDto()
+            {
+                YearMonth = "202310",
+                Amount = 62000
+            }
+        );
+
+        var start = new DateTime(2023, 10, 10);
+        var end = new DateTime(2023, 12, 10);
+        var amount = WhenQueryBudget(start, end);
+
+        amount.Should().Be(45600);
+    }
+   
 
     private decimal WhenQueryBudget(DateTime start, DateTime end)
     {
