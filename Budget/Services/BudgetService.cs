@@ -17,7 +17,15 @@ public class BudgetService
         var budgetDtos = _budgetRepo.GetAll();
 
         var budgetDomainModel = new BudgetDomainModel(budgetDtos);
+        if (start.Month != end.Month)
+        {
+            var startAmount = budgetDomainModel.GetAmount(start,
+                new DateTime(start.Year, start.Month, DateTime.DaysInMonth(start.Year, start.Month)));
 
+            var endAmount = budgetDomainModel.GetAmount(new DateTime(end.Year, end.Month, 1), end);
+
+            return startAmount + endAmount;
+        }     
         return budgetDomainModel.GetAmount(start, end);
     }
 }
@@ -33,7 +41,6 @@ public class BudgetDomainModel
 
     public decimal GetAmount(DateTime start, DateTime end)
     {
-        
         var sum = _budgetDtos.Where(x => x.YearMonth == start.ToString("yyyyMM")).Sum(o => o.Amount);
 
         var daysDiff = (end - start).Days + 1;

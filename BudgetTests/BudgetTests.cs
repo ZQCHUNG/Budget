@@ -35,6 +35,29 @@ public class BudgetTests
     }
 
     [Test]
+    public void query_cross_month()
+    {
+        GivenBudget(
+            new BudgetDto()
+            {
+                YearMonth = "202312",
+                Amount = 3100
+            },
+            new BudgetDto
+            {
+                YearMonth = "202311",
+                Amount = 600
+            }
+        );
+
+        var start = new DateTime(2023, 11, 01);
+        var end = new DateTime(2023, 12, 10);
+        var amount = WhenQueryBudget(start, end);
+
+        amount.Should().Be(1600);
+    }
+
+    [Test]
     public void query_partial_month()
     {
         GivenBudget(
