@@ -15,7 +15,10 @@ public class BudgetService
         var budgetDtos = _budgetRepo.GetAll();
        
         var startYearMonth = start.ToString("yyyyMM");
-        return budgetDtos.Where(x => x.YearMonth == startYearMonth).Sum(o => o.Amount);
-        return 3100;
+
+        var sum = budgetDtos.Where(x => x.YearMonth == startYearMonth).Sum(o => o.Amount);
+        var daysDiff = (end - start).Days + 1;
+        var partialAmount = sum/(DateTime.DaysInMonth(start.Year,start.Month))*daysDiff;
+        return partialAmount;
     }
 }

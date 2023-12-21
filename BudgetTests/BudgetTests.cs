@@ -28,11 +28,30 @@ public class BudgetTests
                 Amount = 3100
             }
         );
-        
+
         var amount = WhenQueryBudget(new DateTime(2023, 12, 01), new DateTime(2023, 12, 31));
 
         amount.Should().Be(3100);
     }
+
+    [Test]
+    public void query_partial_month()
+    {
+        GivenBudget(
+            new BudgetDto()
+            {
+                YearMonth = "202312",
+                Amount = 3100
+            }
+        );
+
+        var start = new DateTime(2023, 12, 01);
+        var end = new DateTime(2023, 12, 10);
+        var amount = WhenQueryBudget(start, end);
+
+        amount.Should().Be(1000);
+    }
+
 
     private decimal WhenQueryBudget(DateTime start, DateTime end)
     {
