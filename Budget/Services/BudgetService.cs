@@ -24,7 +24,7 @@ public class BudgetService
         var budgetDtos = _budgetRepo.GetAll();
 
         var budgetDomainModel = new BudgetDomainModel(budgetDtos);
-        if (start.Month != end.Month)
+        if (dateRange.IsDifferentYearMonth())
         {
             var startAmount = budgetDomainModel.GetAmount(start,
                 new DateTime(start.Year, start.Month, DateTime.DaysInMonth(start.Year, start.Month)));
@@ -61,6 +61,11 @@ public class DateRange
     public bool IsInvalidPeriod()
     {
         return _start > _end;
+    }
+
+    public bool IsDifferentYearMonth()
+    {
+        return _start.ToString("yyyyMM") != _end.ToString("yyyyMM");
     }
 }
 
