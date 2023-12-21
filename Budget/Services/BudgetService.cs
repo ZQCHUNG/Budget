@@ -14,11 +14,13 @@ public class BudgetService
 
     public decimal Query(DateTime start, DateTime end)
     {
-        if (start > end)
+        var dateRange = new DateRange(start, end);
+
+        if (dateRange.IsInvalidPeriod())
         {
             return 0;
         }
-        
+
         var budgetDtos = _budgetRepo.GetAll();
 
         var budgetDomainModel = new BudgetDomainModel(budgetDtos);
@@ -29,13 +31,36 @@ public class BudgetService
 
             var endAmount = budgetDomainModel.GetAmount(new DateTime(end.Year, end.Month, 1), end);
 
-            var middleMonthAmount = budgetDtos.Where(o => Convert.ToInt32(o.YearMonth) > Convert.ToInt32(start.ToString("yyyyMM"))
-                                            && Convert.ToInt32(o.YearMonth) < Convert.ToInt32(end.ToString("yyyyMM"))).Sum(o=>o.Amount);
+            var middleMonthAmount = budgetDtos.Where(o =>
+                Convert.ToInt32(o.YearMonth) > Convert.ToInt32(start.ToString("yyyyMM"))
+                && Convert.ToInt32(o.YearMonth) < Convert.ToInt32(end.ToString("yyyyMM"))).Sum(o => o.Amount);
 
             return startAmount + endAmount + middleMonthAmount;
         }
 
         return budgetDomainModel.GetAmount(start, end);
+    }
+
+    private static bool IsInvalidPeriod(DateTime start, DateTime end)
+    {
+        return start > end;
+    }
+}
+
+public class DateRange
+{
+    private readonly DateTime _start;
+    private readonly DateTime _end;
+
+    public DateRange(DateTime start, DateTime end)
+    {
+        _start = start;
+        _end = end;
+    }
+
+    public bool IsInvalidPeriod()
+    {
+        return _start > _end;
     }
 }
 
